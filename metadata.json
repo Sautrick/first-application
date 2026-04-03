@@ -1,0 +1,5 @@
+{
+  "name": "MediRec",
+  "description": "Extract medicine names from handwritten prescriptions and find cheaper alternatives using AI.",
+  "requestFramePermissions": ["camera"]
+}
