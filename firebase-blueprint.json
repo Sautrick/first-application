@@ -30,6 +30,8 @@
             "type": "object",
             "properties": {
               "originalName": { "type": "string" },
+              "originalEstimatedPrice": { "type": "string" },
+              "activeIngredient": { "type": "string" },
               "dosage": { "type": "string" },
               "frequency": { "type": "string" },
               "duration": { "type": "string" },
@@ -40,7 +42,8 @@
                   "properties": {
                     "name": { "type": "string" },
                     "description": { "type": "string" },
-                    "estimatedPriceRange": { "type": "string" }
+                    "estimatedPrice": { "type": "string" },
+                    "savingsPercentage": { "type": "string" }
                   }
                 }
               }
@@ -50,9 +53,98 @@
         "scannedAt": { "type": "string", "format": "date-time" }
       },
       "required": ["userId", "imageUrl", "medicines", "scannedAt"]
+    },
+    "Product": {
+      "title": "Product Extraction",
+      "description": "Extracted specifications from a product payload",
+      "type": "object",
+      "properties": {
+        "productName": { "type": "string" },
+        "productUrl": { "type": "string" },
+        "productDescription": { "type": "string" },
+        "features": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "productCategory": { "type": "string" },
+        "summary": { "type": "string" },
+        "similarProducts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productName": { "type": "string" },
+              "price": { "type": "string" },
+              "shortDescription": { "type": "string" },
+              "purchaseLink": { "type": "string" },
+              "availabilityStatus": { "type": "string" }
+            }
+          }
+        },
+        "budgetAlternatives": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "productName": { "type": "string" },
+              "price": { "type": "string" },
+              "shortDescription": { "type": "string" },
+              "purchaseLink": { "type": "string" },
+              "availabilityStatus": { "type": "string" }
+            }
+          }
+        },
+        "extractedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["productName", "features", "productCategory", "summary", "similarProducts", "budgetAlternatives", "extractedAt"]
+    },
+    "Schedule": {
+      "title": "Medication Schedule",
+      "description": "Daily medicine intake timeline generated structure",
+      "type": "object",
+      "properties": {
+        "doctorName": { "type": "string" },
+        "patientName": { "type": "string" },
+        "patientAge": { "type": "string" },
+        "prescriptionDate": { "type": "string" },
+        "summary": { "type": "string" },
+        "schedule": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "medicineName": { "type": "string" },
+              "dosage": { "type": "string" },
+              "morning": { "type": "boolean" },
+              "afternoon": { "type": "boolean" },
+              "evening": { "type": "boolean" },
+              "night": { "type": "boolean" },
+              "beforeMeal": { "type": "boolean" },
+              "duration": { "type": "string" },
+              "additionalInstructions": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["schedule", "summary", "createdAt"]
+    },
+    "UsernameMapping": {
+      "title": "Username Mapping",
+      "description": "Maps unique display usernames to their registered auth email and uid",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "uid": { "type": "string" }
+      },
+      "required": ["email", "uid"]
     }
   },
   "firestore": {
+    "/usernames/{username}": {
+      "schema": "UsernameMapping",
+      "description": "Public read-only lookup of authentications details"
+    },
     "/users/{userId}": {
       "schema": "User",
       "description": "User profile document"
@@ -60,6 +152,14 @@
     "/users/{userId}/prescriptions/{prescriptionId}": {
       "schema": "Prescription",
       "description": "History of scanned prescriptions for a user"
+    },
+    "/users/{userId}/products/{productId}": {
+      "schema": "Product",
+      "description": "History of extracted products for a user"
+    },
+    "/users/{userId}/schedules/{scheduleId}": {
+      "schema": "Schedule",
+      "description": "History of medication adherence schedules for a user"
     }
   }
 }

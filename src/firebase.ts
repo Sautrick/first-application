@@ -1,12 +1,25 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
-import { getFirestore, collection, doc, setDoc, addDoc, query, orderBy, onSnapshot, Timestamp, getDocFromServer } from 'firebase/firestore';
+import { 
+  getAuth, 
+  signOut, 
+  onAuthStateChanged, 
+  User,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInAnonymously
+} from 'firebase/auth';
+import { initializeFirestore, collection, doc, setDoc, addDoc, query, orderBy, onSnapshot, Timestamp, getDocFromServer } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = initializeFirestore(app, {
+  experimentalForceLongPolling: true,
+}, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
-export const googleProvider = new GoogleAuthProvider();
 
 export enum OperationType {
   CREATE = 'create',
@@ -56,5 +69,23 @@ async function testConnection() {
 }
 testConnection();
 
-export { signInWithPopup, signOut, onAuthStateChanged, collection, doc, setDoc, addDoc, query, orderBy, onSnapshot, Timestamp };
+export { 
+  signOut, 
+  onAuthStateChanged, 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  sendPasswordResetEmail,
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInAnonymously,
+  collection, 
+  doc, 
+  setDoc, 
+  addDoc, 
+  query, 
+  orderBy, 
+  onSnapshot, 
+  Timestamp 
+};
 export type { User };

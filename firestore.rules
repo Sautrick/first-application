@@ -1,65 +1,24 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // ===============================================================
-    // Assumed Data Model
-    // ===============================================================
-    //
-    // Collection: /users/{userId}
-    // Fields:
-    //   - uid: string (required)
-    //   - email: string (required, email format)
-    //   - displayName: string
-    //   - photoURL: string
-    //   - createdAt: timestamp
-    //
-    // Collection: /users/{userId}/prescriptions/{prescriptionId}
-    // Fields:
-    //   - userId: string (required)
-    //   - imageUrl: string (required)
-    //   - medicines: array (required)
-    //   - scannedAt: timestamp (required)
-    //
-    // ===============================================================
-
-    // Helper Functions
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    function isOwner(userId) {
-      return isAuthenticated() && request.auth.uid == userId;
-    }
-
-    function isValidEmail(email) {
-      return email is string && email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
-    }
-
-    function isValidUser(data) {
-      return data.keys().hasAll(['uid', 'email']) &&
-             data.uid == request.auth.uid &&
-             isValidEmail(data.email);
-    }
-
-    function isValidPrescription(data) {
-      return data.keys().hasAll(['userId', 'imageUrl', 'medicines', 'scannedAt']) &&
-             data.userId == request.auth.uid &&
-             data.medicines is list &&
-             data.imageUrl is string &&
-             data.imageUrl.size() < 1000000; // Limit image URL size (base64 or storage URL)
-    }
-
     // Rules
+    match /usernames/{username} {
+      allow read, write: if true;
+    }
+
     match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidUser(request.resource.data);
-      allow update: if isOwner(userId) && isValidUser(request.resource.data) && 
-                      request.resource.data.uid == resource.data.uid;
+      allow read, write: if true;
 
       match /prescriptions/{prescriptionId} {
-        allow read: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidPrescription(request.resource.data);
-        allow delete: if isOwner(userId);
+        allow read, write: if true;
+      }
+
+      match /products/{productId} {
+        allow read, write: if true;
+      }
+
+      match /schedules/{scheduleId} {
+        allow read, write: if true;
       }
     }
   }
